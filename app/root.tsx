@@ -5,8 +5,8 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { withEmotionCache } from "@emotion/react";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { json } from "@remix-run/node";
+import { ChakraProvider } from "@chakra-ui/react";
+import { useLoaderData } from "@remix-run/react";
 import {
   Links,
   LiveReload,
@@ -15,8 +15,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-
-import { getUser } from "./session.server";
+import { createClient } from "@supabase/supabase-js";
+import { SupabaseProvider } from "./utils/supabase-client";
 import { ClientStyleContext, ServerStyleContext } from "./context";
 
 export const meta: MetaFunction = () => ({
@@ -36,10 +36,11 @@ export let links: LinksFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-  return json({
-    user: await getUser(request),
-  });
+export const loader: LoaderFunction = () => {
+  return {
+    supabaseKey: process.env.SUPABASE_ANON_KEY,
+    supabaseUrl: process.env.SUPABASE_URL,
+  };
 };
 
 interface DocumentProps {
@@ -90,11 +91,16 @@ const Document = withEmotionCache(
 );
 
 export default function App() {
+  const loader = useLoaderData();
+  const supabase = createClient(loader.supabaseUrl, loader.supabaseKey);
+
   return (
     <Document>
-      <ChakraProvider>
-        <Outlet />
-      </ChakraProvider>
+      <SupabaseProvider supabase={supabase}>
+        <ChakraProvider>
+          <Outlet />
+        </ChakraProvider>
+      </SupabaseProvider>
     </Document>
   );
 }

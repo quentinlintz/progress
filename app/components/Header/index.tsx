@@ -40,20 +40,22 @@ export default function Header() {
               spacing={4}
               display={{ base: "none", md: "flex" }}
             >
-              <Button
-                variant={"solid"}
-                size={"sm"}
-                colorScheme={"teal"}
-                leftIcon={<IconPlus />}
-              >
-                <Link to="/post">Post</Link>
-              </Button>
-              <Button size="sm">
-                <Link to="/videos">Videos</Link>
-              </Button>
-              <Button size="sm">
-                <Link to="/streams">Streams</Link>
-              </Button>
+              <Link to="/post">
+                <Button
+                  variant={"solid"}
+                  size={"sm"}
+                  colorScheme={"teal"}
+                  leftIcon={<IconPlus />}
+                >
+                  Post
+                </Button>
+              </Link>
+              <Link to="/videos">
+                <Button size="sm">Videos</Button>
+              </Link>
+              <Link to="/streams">
+                <Button size="sm">Streams</Button>
+              </Link>
             </HStack>
           </HStack>
           <Flex alignItems={"center"}>
@@ -61,9 +63,11 @@ export default function Header() {
               <Button onClick={toggleColorMode}>
                 {colorMode === "light" ? <IconMoonStars /> : <IconSun />}
               </Button>
-              <Button onClick={toggleColorMode}>
-                <IconUser />
-              </Button>
+              <Link to="/profile">
+                <Button>
+                  <IconUser />
+                </Button>
+              </Link>
             </Stack>
           </Flex>
         </Flex>
