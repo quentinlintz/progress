@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // The video limit of this user
+  remainingVideos Int @default(4)
+
+  videos        Video[]
+  streamSources StreamSource[]
+  likes         Like[]
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  url         String
+  thumbnail   String
+  title       String
+  description String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  tags        Tag[]
+  likes       Like[]
+}
+
+model Tag {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  videos Video[]
+}
+
+model Like {
+  id      String  @id @default(cuid())
+  Video   Video?  @relation(fields: [videoId], references: [id])
+  videoId String?
+  user    User?   @relation(fields: [userId], references: [id])
+  userId  String?
+}
+
+model StreamSource {
+  id         String     @id @default(cuid())
+  url        String     @unique
+  streamType StreamType
+  user       User?      @relation(fields: [userId], references: [id])
+  userId     String?
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum StreamType {
+  TWITCH
+  YOUTUBE
+}
