@@ -26,6 +26,7 @@
     "/server/build"
   ],
   "dependencies": {
+    "@chakra-ui/icons": "^1.1.7",
     "@chakra-ui/react": "^1.8.8",
     "@emotion/react": "^11.9.0",
     "@emotion/server": "^11.4.0",
@@ -36,6 +37,7 @@
     "@remix-run/node": "^1.4.3",
     "@remix-run/react": "^1.4.3",
     "@supabase/supabase-js": "^1.31.1",
+    "@tabler/icons": "^1.68.0",
     "bcryptjs": "^2.4.3",
     "framer-motion": "^6.3.3",
     "react": "^17.0.2",
