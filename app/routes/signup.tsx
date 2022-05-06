@@ -5,6 +5,8 @@ import { useSubmit } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { commitSession, getSession } from "~/utils/supabase.server";
+import { Container, Text } from "@chakra-ui/react";
+import Header from "~/components/Header";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
@@ -25,14 +27,18 @@ export default function SignIn() {
 
   return (
     <Auth.UserContextProvider supabaseClient={supabase}>
-      <Container>
-        <Auth supabaseClient={supabase} providers={["twitch"]} />
-      </Container>
+      <Header />
+      <FormContainer>
+        <Container size="md" pt={16} textAlign="center">
+          <Text fontSize="2xl">Sign in to continue</Text>
+          <Auth supabaseClient={supabase} magicLink />
+        </Container>
+      </FormContainer>
     </Auth.UserContextProvider>
   );
 }
 
-const Container: React.FC = ({ children }) => {
+const FormContainer: React.FC = ({ children }) => {
   const { user, session } = Auth.useUser();
   const submit = useSubmit();
 
@@ -46,7 +52,7 @@ const Container: React.FC = ({ children }) => {
       // as long as it checks if the user is signed in
       if (accessToken) {
         formData.append("access_token", accessToken);
-        submit(formData, { method: "post", action: "/auth" });
+        submit(formData, { method: "post", action: "/signup" });
       }
     }
   }, [user]);

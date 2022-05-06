@@ -5,7 +5,7 @@ import type { ActionFunction } from "@remix-run/node";
 export const action: ActionFunction = async ({ request }) => {
   let session = await getSession(request.headers.get("Cookie"));
 
-  return redirect("/auth", {
+  return redirect("/signup", {
     headers: {
       "Set-Cookie": await destroySession(session),
     },

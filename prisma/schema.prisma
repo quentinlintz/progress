@@ -7,62 +7,59 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id    String @id @default(cuid())
-  email String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // The video limit of this user
-  remainingVideos Int @default(4)
-
-  videos        Video[]
-  streamSources StreamSource[]
-  likes         Like[]
+model users {
+  id              String           @id @default(uuid()) @db.Uuid
+  email           String           @unique
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now())
+  remainingVideos Int              @default(4)
+  role            roles            @default(USER)
+  videos          videos[]
+  streamSources   stream_sources[]
+  likes           likes[]
 }
 
-model Video {
-  id          String   @id @default(cuid())
+model videos {
+  id          String   @id @default(uuid()) @db.Uuid
   url         String
   thumbnail   String
   title       String
   description String
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @db.Uuid
+  user        users    @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
-  tags        Tag[]
-  likes       Like[]
+  tags        tags[]
+  likes       likes[]
 }
 
-model Tag {
-  id     String  @id @default(cuid())
-  name   String  @unique
-  videos Video[]
+model tags {
+  id     String   @id @default(uuid()) @db.Uuid
+  name   String   @unique
+  videos videos[]
 }
 
-model Like {
-  id      String  @id @default(cuid())
-  Video   Video?  @relation(fields: [videoId], references: [id])
-  videoId String?
-  user    User?   @relation(fields: [userId], references: [id])
-  userId  String?
+model likes {
+  id      String  @id @default(uuid()) @db.Uuid
+  Video   videos? @relation(fields: [videoId], references: [id])
+  videoId String  @db.Uuid
+  user    users?  @relation(fields: [userId], references: [id])
+  userId  String  @db.Uuid
 }
 
-model StreamSource {
-  id         String     @id @default(cuid())
-  url        String     @unique
-  streamType StreamType
-  user       User?      @relation(fields: [userId], references: [id])
-  userId     String?
+model stream_sources {
+  id         String       @id @default(uuid()) @db.Uuid
+  url        String       @unique
+  streamType stream_types
+  user       users?       @relation(fields: [userId], references: [id])
+  userId     String       @db.Uuid
 }
 
-enum Role {
+enum roles {
   USER
   ADMIN
 }
 
-enum StreamType {
+enum stream_types {
   TWITCH
   YOUTUBE
 }
