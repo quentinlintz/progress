@@ -1,9 +1,9 @@
 import { prisma } from "../utils/prisma";
 
-import type { User, Video } from "@prisma/client";
+import type { users as User, videos as Video } from "@prisma/client";
 
 export async function getVideos() {
-  return prisma.video.findMany({
+  return prisma.videos.findMany({
     orderBy: { createdAt: "desc" },
     include: { likes: true, tags: true },
     take: 16,
@@ -11,7 +11,7 @@ export async function getVideos() {
 }
 
 export async function getVideosByUser(userId: string): Promise<Array<Video>> {
-  return prisma.video.findMany({
+  return prisma.videos.findMany({
     where: { userId: userId },
     orderBy: { createdAt: "desc" },
     include: { likes: true, tags: true },
@@ -33,7 +33,7 @@ export function addVideo({
   description: string;
   tags: string[];
 }) {
-  return prisma.video.create({
+  return prisma.videos.create({
     data: {
       url,
       thumbnail,

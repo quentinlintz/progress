@@ -36,7 +36,7 @@ export let links: LinksFunction = () => {
   ];
 };
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = async ({ request }) => {
   return {
     supabaseKey: process.env.SUPABASE_ANON_KEY,
     supabaseUrl: process.env.SUPABASE_URL,

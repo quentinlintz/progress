@@ -6,6 +6,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({ ok: true });
 };
 
-export default function Streams() {
+export default function Videos() {
   return <Header />;
 }

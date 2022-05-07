@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
 import { createCookieSessionStorage } from "@remix-run/node";
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL as string;
 const supabaseKey = process.env.SUPABASE_ANON_KEY as string;
@@ -8,8 +8,16 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 const { getSession, commitSession, destroySession } =
   createCookieSessionStorage({
+    // a Cookie from `createCookie` or the CookieOptions to create one
     cookie: {
       name: "supabase-session",
+      expires: new Date(Date.now() + 3600),
+      httpOnly: true,
+      maxAge: 60,
+      path: "/",
+      sameSite: "lax",
+      secrets: ["s3cret1"],
+      secure: true,
     },
   });
 
