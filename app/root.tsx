@@ -5,7 +5,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { withEmotionCache } from "@emotion/react";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { useLoaderData } from "@remix-run/react";
 import {
   Links,
@@ -95,6 +95,16 @@ const Document = withEmotionCache(
   }
 );
 
+const theme = extendTheme({
+  styles: {
+    global: (props: any) => ({
+      body: {
+        fontFamily: "Poppins",
+      },
+    }),
+  },
+});
+
 export default function App() {
   const loader = useLoaderData();
   const supabase = createClient(loader.supabaseUrl, loader.supabaseKey);
@@ -102,7 +112,7 @@ export default function App() {
   return (
     <Document>
       <SupabaseProvider supabase={supabase}>
-        <ChakraProvider>
+        <ChakraProvider theme={theme}>
           <Outlet />
         </ChakraProvider>
       </SupabaseProvider>

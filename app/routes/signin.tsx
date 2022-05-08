@@ -17,8 +17,6 @@ export const action: ActionFunction = async ({ request }) => {
   session.set("accessToken", formData.get("accessToken"));
   session.set("userId", formData.get("userId"));
 
-  console.log("CALLING REDIRECT", redirectTo);
-
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await commitSession(session),
