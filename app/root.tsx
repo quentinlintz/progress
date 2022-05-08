@@ -18,6 +18,8 @@ import {
 import { createClient } from "@supabase/supabase-js";
 import { SupabaseProvider } from "./utils/supabase-client";
 import { ClientStyleContext, ServerStyleContext } from "./context";
+import { getUser } from "./models/user.server";
+import globalStyles from "./styles/global.css";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -33,11 +35,13 @@ export let links: LinksFunction = () => {
       rel: "stylesheet",
       href: "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap",
     },
+    { rel: "stylesheet", href: globalStyles },
   ];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   return {
+    user: await getUser(request),
     supabaseKey: process.env.SUPABASE_ANON_KEY,
     supabaseUrl: process.env.SUPABASE_URL,
   };
@@ -64,6 +68,7 @@ const Document = withEmotionCache(
       });
       // reset cache to reapply global styles
       clientStyleData?.reset();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

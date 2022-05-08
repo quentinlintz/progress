@@ -1,21 +1,20 @@
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useSubmit } from "@remix-run/react";
 import Header from "~/components/Header";
 import { Button, Container } from "@chakra-ui/react";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useSupabase } from "~/utils/supabase-client";
-import { getUserById, requireUserId } from "~/models/user.server";
+import { requireUserId } from "~/models/user.server";
+import { useUser } from "~/utils/user";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
-  const user = await getUserById(userId);
+  await requireUserId(request);
 
-  return json({ ok: true, user });
+  return json({ ok: true });
 };
 
 export default function Profile() {
-  const loader = useLoaderData();
-  const user = loader.user;
+  const user = useUser();
   const submit = useSubmit();
   const supabase = useSupabase();
 

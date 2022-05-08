@@ -10,13 +10,16 @@ import { redirect } from "@remix-run/node";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+  const redirectTo = String(formData.get("redirectTo"));
 
   const session = await getSession(request.headers.get("Cookie"));
 
-  session.set("access_token", formData.get("access_token"));
+  session.set("accessToken", formData.get("accessToken"));
   session.set("userId", formData.get("userId"));
 
-  return redirect("/videos", {
+  console.log("CALLING REDIRECT", redirectTo);
+
+  return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await commitSession(session),
     },
@@ -24,6 +27,8 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const AuthContainer: React.FC = ({ children }) => {
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo") || "/profile";
   const { user, session } = Auth.useUser();
   const submit = useSubmit();
 
@@ -34,11 +39,13 @@ const AuthContainer: React.FC = ({ children }) => {
       const accessToken = session?.access_token;
 
       if (accessToken) {
-        formData.append("access_token", accessToken);
+        formData.append("accessToken", accessToken);
         formData.append("userId", user.id);
+        formData.append("redirectTo", String(redirectTo));
         submit(formData, { method: "post", action: "/signin" });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   return <>{children}</>;
@@ -52,7 +59,7 @@ export default function SignIn() {
       <Header />
       <Container>
         <AuthContainer>
-          <Auth supabaseClient={supabase} />
+          <Auth supabaseClient={supabase} magicLink />
         </AuthContainer>
       </Container>
     </Auth.UserContextProvider>
