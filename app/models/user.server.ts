@@ -1,4 +1,8 @@
-import type { users as User } from "@prisma/client";
+import type {
+  users as User,
+  stream_sources as StreamSource,
+  stream_types as StreamType,
+} from "@prisma/client";
 import { redirect } from "@remix-run/node";
 import { getSession } from "~/utils/supabase.server";
 import { prisma } from "../utils/prisma";

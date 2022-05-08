@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { useLoaderData, useSubmit } from "@remix-run/react";
 import Header from "~/components/Header";
 import {
@@ -6,7 +5,6 @@ import {
   Container,
   Flex,
   Spacer,
-  Spinner,
   Stack,
   StackDivider,
   Text,
@@ -15,21 +13,26 @@ import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useSupabase } from "~/utils/supabase-client";
 import { requireUserId } from "~/models/user.server";
+import type { Video } from "~/models/videos.server";
 import { getVideosByUser } from "~/models/videos.server";
 import { useUser } from "~/utils/user";
+import { getStreamSourcesByUser } from "~/models/streamSources.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await requireUserId(request);
   const videos = await getVideosByUser(userId);
+  const streamSources = await getStreamSourcesByUser(userId);
 
-  return json({ ok: true, videos });
+  return json({ ok: true, videos, streamSources });
 };
 
 export default function Profile() {
   const user = useUser();
-  const { videos } = useLoaderData();
+  const { videos, streamSources } = useLoaderData();
   const submit = useSubmit();
   const supabase = useSupabase();
+
+  console.log(streamSources);
 
   const handleSignOut = () => {
     supabase.auth.signOut().then(() => {
@@ -71,7 +74,7 @@ export default function Profile() {
               Videos
             </Text>
             {videos.length !== 0 ? (
-              videos.length
+              videos.map((video: Video) => video.title)
             ) : (
               <Text fontWeight={"200"} fontSize={"xl"} isTruncated>
                 You haven't posted anything yet

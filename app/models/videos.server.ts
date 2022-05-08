@@ -12,9 +12,9 @@ export async function getVideos() {
   });
 }
 
-export async function getVideosByUser(userId: string): Promise<Array<Video>> {
+export async function getVideosByUser(id: User["id"]): Promise<Array<Video>> {
   return prisma.videos.findMany({
-    where: { userId: userId },
+    where: { userId: id },
     orderBy: { createdAt: "desc" },
     include: { likes: true, tags: true },
   });
