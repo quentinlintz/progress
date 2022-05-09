@@ -1,8 +1,4 @@
-import type {
-  users as User,
-  stream_sources as StreamSource,
-  stream_types as StreamType,
-} from "@prisma/client";
+import type { users as User } from "@prisma/client";
 import { redirect } from "@remix-run/node";
 import { getSession } from "~/utils/supabase.server";
 import { prisma } from "../utils/prisma";
@@ -12,7 +8,10 @@ export type { users as User } from "@prisma/client";
 const USER_SESSION_KEY = "userId";
 
 export async function getUserById(id: User["id"]) {
-  return prisma.users.findUnique({ where: { id } });
+  return prisma.users.findUnique({
+    where: { id },
+    include: { videos: true, streamSources: true },
+  });
 }
 
 export async function getUserByEmail(email?: User["email"]) {

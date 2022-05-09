@@ -12,27 +12,21 @@ import {
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useSupabase } from "~/utils/supabase-client";
-import { requireUserId } from "~/models/user.server";
+import { getUserById, requireUserId } from "~/models/user.server";
 import type { Video } from "~/models/videos.server";
-import { getVideosByUser } from "~/models/videos.server";
-import { useUser } from "~/utils/user";
-import { getStreamSourcesByUser } from "~/models/streamSources.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await requireUserId(request);
-  const videos = await getVideosByUser(userId);
-  const streamSources = await getStreamSourcesByUser(userId);
+  const user = await getUserById(userId);
 
-  return json({ ok: true, videos, streamSources });
+  return json({ ok: true, user });
 };
 
 export default function Profile() {
-  const user = useUser();
-  const { videos, streamSources } = useLoaderData();
+  const { user } = useLoaderData();
+  const videos = user.videos;
   const submit = useSubmit();
   const supabase = useSupabase();
-
-  console.log(streamSources);
 
   const handleSignOut = () => {
     supabase.auth.signOut().then(() => {
