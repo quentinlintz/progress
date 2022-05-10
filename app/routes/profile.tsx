@@ -31,11 +31,20 @@ import { ErrorMessage } from "~/components/ErrorMessage";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const login = formData.get("login");
+  const login = String(formData.get("login"));
   const action = formData.get("action");
 
   const clientId = process.env.TWITCH_CLIENT_ID as string;
   const accessToken = process.env.TWITCH_ACCESS_TOKEN as string;
+
+  // Return an error if the Twitch user isn't found
+  const errors = {
+    userName: login?.length !== 0 ? null : "A username must be entered",
+  };
+  const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
+  if (hasErrors) {
+    return json(errors);
+  }
 
   switch (action) {
     case "link": {
@@ -57,7 +66,7 @@ export const action: ActionFunction = async ({ request }) => {
 
       // Return an error if the Twitch user isn't found
       const errors = {
-        userName: data.length !== 0 ? null : "Twitch user not found!",
+        userName: data.length !== 0 ? null : "Twitch user not found",
       };
       const hasErrors = Object.values(errors).some(
         (errorMessage) => errorMessage
