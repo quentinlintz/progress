@@ -27,3 +27,24 @@ export function addStreamSource({
     },
   });
 }
+
+export function removeStreamSource({
+  streamType,
+  userId,
+}: {
+  streamType: StreamType;
+  userId: User["id"];
+}) {
+  return prisma.stream_sources.deleteMany({
+    where: {
+      AND: [
+        {
+          streamType,
+        },
+        {
+          userId,
+        },
+      ],
+    },
+  });
+}

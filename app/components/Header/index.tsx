@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     <>
-      <Box bg={useColorModeValue("teal.100", "teal.900")} px={4}>
+      <Box bg={useColorModeValue("teal.700", "teal.900")} px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Button
             size={"md"}

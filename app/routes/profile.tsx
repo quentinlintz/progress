@@ -1,5 +1,6 @@
 import {
   Form,
+  Link,
   useActionData,
   useLoaderData,
   useSubmit,
@@ -12,7 +13,6 @@ import {
   Flex,
   Input,
   Spacer,
-  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -23,6 +23,7 @@ import { getUserById, getUserId, requireUserId } from "~/models/user.server";
 import type { Video } from "~/models/videos.server";
 import { StreamType } from "~/models/videos.server";
 import type { StreamSource } from "~/models/streamSources.server";
+import { removeStreamSource } from "~/models/streamSources.server";
 import { addStreamSource } from "~/models/streamSources.server";
 import { IconBrandTwitch } from "@tabler/icons";
 import invariant from "tiny-invariant";
@@ -76,13 +77,20 @@ export const action: ActionFunction = async ({ request }) => {
       };
 
       // TODO check for errors
-      const streamSource = await addStreamSource(streamSourceData);
+      await addStreamSource(streamSourceData);
 
       return json({ ok: true });
     }
 
     case "unlink": {
-      // TODO add unlink
+      const userId = await getUserId(request);
+
+      const streamSourceData = {
+        userId,
+        streamType: StreamType.TWITCH,
+      };
+
+      await removeStreamSource(streamSourceData);
     }
   }
 
@@ -103,11 +111,11 @@ export default function Profile() {
   const submit = useSubmit();
   const supabase = useSupabase();
 
+  let transitionState =
+    transition.state === "submitting" || transition.state === "loading";
+
   const videos = user.videos;
   const streamSources = user.streamSources;
-
-  const linkTwitchText =
-    transition.state === "submitting" ? <Spinner /> : "Link";
 
   const twitchSource =
     streamSources.find((source: StreamSource) => {
@@ -149,7 +157,9 @@ export default function Profile() {
               <Input
                 flex="4"
                 borderRightRadius="0"
-                placeholder="Your Twitch username"
+                placeholder={
+                  twitchSource ? twitchSource.name : "Your Twitch username"
+                }
                 name="login"
                 disabled={twitchSource}
               />
@@ -160,8 +170,11 @@ export default function Profile() {
                   leftIcon={<IconBrandTwitch />}
                   bgColor="#9146FF"
                   color="white"
+                  type="submit"
                   name="action"
                   value="unlink"
+                  disabled={transitionState}
+                  isLoading={transitionState}
                 >
                   Unlink
                 </Button>
@@ -175,9 +188,10 @@ export default function Profile() {
                   type="submit"
                   name="action"
                   value="link"
-                  disabled={transition.state === "submitting"}
+                  disabled={transitionState}
+                  isLoading={transitionState}
                 >
-                  {linkTwitchText}
+                  Link
                 </Button>
               )}
             </Flex>
@@ -196,9 +210,14 @@ export default function Profile() {
         {videos.length !== 0 ? (
           videos.map((video: Video) => video.title)
         ) : (
-          <Text fontWeight={"200"} fontSize={"xl"} isTruncated>
-            You haven't posted anything yet
-          </Text>
+          <>
+            <Text fontWeight={"200"} fontSize={"xl"} isTruncated>
+              You haven't posted anything yet
+            </Text>
+            <Button size="md" colorScheme={"teal"}>
+              <Link to="/post">Post now</Link>
+            </Button>
+          </>
         )}
       </Stack>
     </>
