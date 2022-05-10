@@ -1,7 +1,7 @@
 import type { users as User } from "@prisma/client";
 import { redirect } from "@remix-run/node";
 import { getSession } from "~/utils/supabase.server";
-import { prisma } from "../utils/prisma";
+import prisma from "../utils/prisma";
 
 export type { users as User } from "@prisma/client";
 

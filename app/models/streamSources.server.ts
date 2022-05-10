@@ -1,4 +1,4 @@
-import { prisma } from "../utils/prisma";
+import prisma from "../utils/prisma";
 
 import type { users as User, stream_types as StreamType } from "@prisma/client";
 
