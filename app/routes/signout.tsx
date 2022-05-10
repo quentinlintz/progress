@@ -13,6 +13,5 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader = () => {
-  // Redirect to `/` if user tried to access `/signout`
   return redirect("/");
 };

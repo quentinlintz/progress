@@ -1,33 +1,27 @@
 import { prisma } from "../utils/prisma";
 
-import type {
-  users as User,
-  stream_sources as StreamSource,
-  stream_types as StreamType,
-} from "@prisma/client";
+import type { users as User, stream_types as StreamType } from "@prisma/client";
 
 export type { stream_sources as StreamSource } from "@prisma/client";
 
-export async function getStreamSourcesByUser(
-  userId: string
-): Promise<Array<StreamSource>> {
-  return prisma.stream_sources.findMany({
-    where: { userId: userId },
-  });
-}
-
 export function addStreamSource({
-  userId,
-  url,
+  name,
+  description,
+  thumbnail,
   streamType,
+  userId,
 }: {
-  userId: User["id"];
-  url: string;
+  name: string;
+  description: string;
+  thumbnail: string;
   streamType: StreamType;
+  userId: User["id"];
 }) {
   return prisma.stream_sources.create({
     data: {
-      url,
+      name,
+      description,
+      thumbnail,
       streamType,
       user: { connect: { id: userId } },
     },

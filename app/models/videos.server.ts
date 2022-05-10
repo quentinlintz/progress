@@ -1,8 +1,9 @@
 import { prisma } from "../utils/prisma";
 
-import type { users as User, videos as Video } from "@prisma/client";
+import type { users as User } from "@prisma/client";
 
 export type { videos as Video } from "@prisma/client";
+export { stream_types as StreamType } from "@prisma/client";
 
 export async function getVideos() {
   return prisma.videos.findMany({
