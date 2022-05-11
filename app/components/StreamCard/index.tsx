@@ -75,7 +75,7 @@ const StreamCard = ({
             </Flex>
             <Text
               textAlign={"start"}
-              fontWeight={"300"}
+              fontWeight={"400"}
               fontSize={["lg", "lg", "sm"]}
               noOfLines={4}
             >

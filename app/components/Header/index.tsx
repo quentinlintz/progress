@@ -26,7 +26,6 @@ const Header = () => {
       <Box px={4}>
         <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
           <Button
-            size={"md"}
             display={{ md: "none" }}
             aria-label={"Open Menu"}
             onClick={isOpen ? onClose : onOpen}

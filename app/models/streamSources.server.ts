@@ -16,6 +16,7 @@ export function addStreamSource({
   description,
   thumbnail,
   streamType,
+  streamId,
   userId,
 }: {
   login: string;
@@ -23,6 +24,7 @@ export function addStreamSource({
   description: string;
   thumbnail: string;
   streamType: StreamType;
+  streamId: string;
   userId: User["id"];
 }) {
   return prisma.stream_sources.create({
@@ -32,6 +34,7 @@ export function addStreamSource({
       description,
       thumbnail,
       streamType,
+      streamId,
       user: { connect: { id: userId } },
     },
   });

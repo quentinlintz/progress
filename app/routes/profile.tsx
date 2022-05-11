@@ -84,6 +84,7 @@ export const action: ActionFunction = async ({ request }) => {
         description: user.description,
         thumbnail: user.profile_image_url,
         streamType: StreamType.TWITCH,
+        streamId: user.id,
       };
 
       // TODO check for errors
@@ -221,7 +222,7 @@ export default function Profile() {
           videos.map((video: Video) => video.title)
         ) : (
           <>
-            <Text fontWeight={"200"} fontSize={"xl"} isTruncated>
+            <Text fontWeight={"300"} fontSize={"xl"} isTruncated>
               You haven't posted anything yet
             </Text>
             <Button colorScheme={"cyan"}>

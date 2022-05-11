@@ -53,6 +53,7 @@ model stream_sources {
   description String
   thumbnail   String
   streamType  stream_types
+  streamId    String
   user        users?       @relation(fields: [userId], references: [id])
   userId      String       @db.Uuid
 }
