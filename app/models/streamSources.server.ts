@@ -4,14 +4,22 @@ import type { users as User, stream_types as StreamType } from "@prisma/client";
 
 export type { stream_sources as StreamSource } from "@prisma/client";
 
+export async function getStreamSources() {
+  return prisma.stream_sources.findMany({
+    take: 16,
+  });
+}
+
 export function addStreamSource({
-  name,
+  login,
+  displayName,
   description,
   thumbnail,
   streamType,
   userId,
 }: {
-  name: string;
+  login: string;
+  displayName: string;
   description: string;
   thumbnail: string;
   streamType: StreamType;
@@ -19,7 +27,8 @@ export function addStreamSource({
 }) {
   return prisma.stream_sources.create({
     data: {
-      name,
+      login,
+      displayName,
       description,
       thumbnail,
       streamType,

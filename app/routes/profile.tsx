@@ -27,7 +27,7 @@ import { removeStreamSource } from "~/models/streamSources.server";
 import { addStreamSource } from "~/models/streamSources.server";
 import { IconBrandTwitch } from "@tabler/icons";
 import invariant from "tiny-invariant";
-import { ErrorMessage } from "~/components/ErrorMessage";
+import ErrorMessage from "~/components/ErrorMessage";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
@@ -79,7 +79,8 @@ export const action: ActionFunction = async ({ request }) => {
       const user = data[0];
       const streamSourceData = {
         userId,
-        name: user.display_name,
+        login: user.login,
+        displayName: user.display_name,
         description: user.description,
         thumbnail: user.profile_image_url,
         streamType: StreamType.TWITCH,
@@ -223,8 +224,8 @@ export default function Profile() {
             <Text fontWeight={"200"} fontSize={"xl"} isTruncated>
               You haven't posted anything yet
             </Text>
-            <Button size="md" colorScheme={"teal"}>
-              <Link to="/post">Post now</Link>
+            <Button colorScheme={"cyan"}>
+              <Link to="/post">Post Now</Link>
             </Button>
           </>
         )}

@@ -4,7 +4,6 @@ import {
   Flex,
   Button,
   useDisclosure,
-  useColorModeValue,
   Stack,
   useColorMode,
   HStack,
@@ -18,7 +17,7 @@ import {
   IconUser,
 } from "@tabler/icons";
 
-export default function Header() {
+const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -43,18 +42,17 @@ export default function Header() {
               <Link to="/post">
                 <Button
                   variant={"solid"}
-                  size={"sm"}
-                  colorScheme={"teal"}
+                  colorScheme={"cyan"}
                   leftIcon={<IconPlus />}
                 >
                   Post
                 </Button>
               </Link>
               <Link to="/videos">
-                <Button size="sm">Videos</Button>
+                <Button>Videos</Button>
               </Link>
               <Link to="/streams">
-                <Button size="sm">Streams</Button>
+                <Button>Streams</Button>
               </Link>
             </HStack>
           </HStack>
@@ -84,4 +82,6 @@ export default function Header() {
       </Box>
     </>
   );
-}
+};
+
+export default Header;

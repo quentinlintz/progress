@@ -48,7 +48,8 @@ model likes {
 
 model stream_sources {
   id          String       @id @default(uuid()) @db.Uuid
-  name        String       @unique
+  login       String       @unique
+  displayName String
   description String
   thumbnail   String
   streamType  stream_types

@@ -5,7 +5,7 @@ import {
   AlertTitle,
 } from "@chakra-ui/react";
 
-export const ErrorMessage = ({ children }: any) => {
+const ErrorMessage = ({ children }: any) => {
   return (
     <>
       {children ? (
@@ -18,3 +18,5 @@ export const ErrorMessage = ({ children }: any) => {
     </>
   );
 };
+
+export default ErrorMessage;
