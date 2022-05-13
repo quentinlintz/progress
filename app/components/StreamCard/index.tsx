@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Center,
   Flex,
   Icon,
   Link,
@@ -46,9 +45,11 @@ const StreamCard = ({
           boxShadow={"2xl"}
           rounded={"lg"}
           p={4}
-          bg={useColorModeValue("white", "gray.800")}
+          bgGradient={useColorModeValue(
+            "linear(to-br, gray.100, gray.200)",
+            "linear(to-br, gray.700, gray.800)"
+          )}
           minH={60}
-          borderWidth="1px"
         >
           <Stack divider={<StackDivider />}>
             <Flex alignItems={"center"} mb={2}>

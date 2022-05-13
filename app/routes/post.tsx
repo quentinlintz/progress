@@ -1,12 +1,13 @@
-import { Container, Stack, Text } from "@chakra-ui/react";
+import { Button, Container, Flex, Stack, Text } from "@chakra-ui/react";
 import { useLoaderData } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ErrorMessage from "~/components/ErrorMessage";
 import Header from "~/components/Header";
+import VideoPostCard from "~/components/VideoPostCard";
+import { PostContext } from "~/contexts/PostContext";
 import { getUserById, requireUserId } from "~/models/user.server";
-import { useUser } from "~/utils/user";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await requireUserId(request);
@@ -42,32 +43,69 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ error: "You have no videos to post." });
   }
 
-  return json({ ok: true, videos });
+  return json({ ok: true, user, videos });
 };
 
 export default function Post() {
-  const user = useUser();
-  const loader = useLoaderData();
+  const { user, videos, error } = useLoaderData();
   const [remainingVideos, setRemainingVideos] = useState(user.remainingVideos);
+  const [selectedVideos, setSelectedVideos] = useState(
+    user.videos.filter((v: any) => v === videos.id)
+  );
+
+  useEffect(() => {
+    console.log(selectedVideos);
+  }, [selectedVideos]);
 
   return (
     <>
       <Header />
-      <Container maxW="xl" alignItems={"center"}>
-        <Stack spacing={"4"} alignItems={"center"}>
-          <Text fontWeight={"600"} fontSize={"xl"}>
-            {remainingVideos} posts remaining
-          </Text>
-          <Text fontWeight={"300"} fontSize={"md"} textAlign={"center"}>
+      <Flex alignItems={"center"} pl={4} pr={4}>
+        <Text flex="1" fontWeight={"600"} fontSize={["xl", "2xl"]}>
+          {remainingVideos} posts remaining
+        </Text>
+        <Button colorScheme="cyan" size="lg">
+          Save
+        </Button>
+      </Flex>
+      <Stack spacing={"4"} alignItems={"center"} pr={4} pl={4}>
+        <Container>
+          <Text
+            fontWeight={"300"}
+            fontSize={"md"}
+            textAlign={"center"}
+            pb="4"
+            pt="4"
+          >
             Select which videos you want to post and add tags of the
-            languages/frameworks you're using.
+            languages/frameworks you're using. They'll appear on the 'Videos'
+            page with extra details like the video thumbnail and description.
           </Text>
-          {loader.videos.map((video: any) => (
-            <div key={video.title}>{video.title}</div>
-          ))}
-          {loader.error ? <ErrorMessage>{loader.error}</ErrorMessage> : null}
-        </Stack>
-      </Container>
+          <PostContext.Provider
+            value={{
+              selectedVideos,
+              setSelectedVideos,
+              remainingVideos,
+              setRemainingVideos,
+            }}
+          >
+            <Stack spacing="5">
+              {videos.map((video: any) => {
+                return (
+                  <VideoPostCard
+                    key={video.id}
+                    video={video}
+                    isSelected={selectedVideos.forEach((v: any) => {
+                      if (v.id === video.id) return true;
+                    })}
+                  />
+                );
+              })}
+            </Stack>
+          </PostContext.Provider>
+          {error ? <ErrorMessage>{error}</ErrorMessage> : null}
+        </Container>
+      </Stack>
     </>
   );
 }
