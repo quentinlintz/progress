@@ -12,27 +12,24 @@ import {
   requireUserId,
   updateRemainingVideos,
 } from "~/models/user.server";
-import { unionBy, differenceBy, some } from "lodash";
+import { unionBy, some } from "lodash";
+import type { Video } from "~/models/videos.server";
+import { addVideos, clearVideosByUser } from "~/models/videos.server";
+import { convertTwitchVideos } from "~/utils/video";
 
 export const action: ActionFunction = async ({ request }) => {
   const userId = await requireUserId(request);
-  const user = await getUserById(userId);
   const formData = await request.formData();
-  const selectedVideos = formData.get("selectedVideos");
+  const selectedVideos = JSON.parse(String(formData.get("selectedVideos")));
   const remainingVideos = Number(formData.get("remainingVideos"));
 
+  // TODO think of an algorithm to optimize this!
+  // Drop all current videos
+  clearVideosByUser(userId);
+  // Add all selected videos
+  addVideos({ videos: selectedVideos });
+
   await updateRemainingVideos(userId, remainingVideos);
-
-  if (!user) {
-    return json({ error: "User not found" });
-  }
-
-  const currentVideos = user.videos;
-
-  //
-
-  // const videosToRemove =
-  // const videosToAdd =
 
   return json({ ok: true });
 };
@@ -54,7 +51,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const clientId = process.env.TWITCH_CLIENT_ID as string;
   const accessToken = process.env.TWITCH_ACCESS_TOKEN as string;
 
-  const videos = await fetch(
+  const twitchVideos = await fetch(
     `https://api.twitch.tv/helix/videos?user_id=${streamSource.streamId}&first=1&sort=time&type=archive`,
     {
       method: "GET",
@@ -67,9 +64,14 @@ export const loader: LoaderFunction = async ({ request }) => {
     .then((res) => res.json())
     .then((res) => res.data);
 
-  if (videos.length === 0) {
+  if (twitchVideos.length === 0) {
     return json({ loaderError: "You have no videos to post." });
   }
+
+  const videos = convertTwitchVideos({
+    twitchVideos,
+    userId,
+  });
 
   return json({ ok: true, user, videos });
 };
@@ -78,9 +80,13 @@ export default function Post() {
   const { user, videos, error } = useLoaderData();
   const submit = useSubmit();
   const transition = useTransition();
-  const mergedVideos = unionBy(videos, user.videos, "id");
-  const [remainingVideos, setRemainingVideos] = useState(user.remainingVideos);
-  const [selectedVideos, setSelectedVideos] = useState(user.videos);
+  const mergedVideos = unionBy(videos, user.videos, "videoId");
+  const [remainingVideos, setRemainingVideos] = useState<Number>(
+    user.remainingVideos
+  );
+  const [selectedVideos, setSelectedVideos] = useState<Array<Video>>(
+    user.videos
+  );
 
   let transitionState =
     transition.state === "submitting" || transition.state === "loading";
@@ -88,8 +94,8 @@ export default function Post() {
   const handleSave = () => {
     const formData = new FormData();
 
-    formData.append("selectedVideos", selectedVideos);
-    formData.append("remainingVideos", remainingVideos);
+    formData.append("selectedVideos", JSON.stringify(selectedVideos));
+    formData.append("remainingVideos", remainingVideos.toString());
 
     submit(formData, { method: "post", action: "/post" });
   };

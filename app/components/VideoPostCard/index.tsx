@@ -7,14 +7,14 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { PostContext } from "~/contexts/PostContext";
+import type { Video } from "~/models/videos.server";
 
 type Props = {
-  video: any;
+  video: Video;
   isSelected: boolean;
 };
 
 const VideoPostCard = ({ video, isSelected }: Props) => {
-  const { id, title, created_at } = video;
   const [isChecked, setIsChecked] = useState(isSelected);
   const {
     selectedVideos,
@@ -22,13 +22,13 @@ const VideoPostCard = ({ video, isSelected }: Props) => {
     remainingVideos,
     setRemainingVideos,
   }: any = useContext(PostContext);
-  let date = new Date(created_at);
+  let date = new Date(video.createdAt);
   const readableDate =
     date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear();
 
   const handleChecked = (e: any) => {
     if (!e.target.checked) {
-      setSelectedVideos(selectedVideos.filter((video: any) => video.id !== id));
+      setSelectedVideos(selectedVideos.filter((v: Video) => v.id !== video.id));
       setRemainingVideos(remainingVideos + 1);
       setIsChecked(e.target.checked);
     } else if (remainingVideos > 0) {
@@ -58,7 +58,7 @@ const VideoPostCard = ({ video, isSelected }: Props) => {
       >
         <Stack direction="column" maxW={[250, 500]}>
           <Text fontWeight={"600"} isTruncated>
-            {title}
+            {video.title}
           </Text>
           <Text fontWeight={"300"}>Created on: {readableDate}</Text>
         </Stack>

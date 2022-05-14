@@ -1,49 +1,47 @@
 import prisma from "../utils/prisma";
+import { omit, map } from "lodash";
 
-import type { users as User } from "@prisma/client";
+import type { users as User, videos as Video } from "@prisma/client";
 
 export type { videos as Video } from "@prisma/client";
 export { stream_types as StreamType } from "@prisma/client";
+
+export type TwitchVideo = {
+  id: string;
+  stream_id: string;
+  user_id: string;
+  user_login: string;
+  user_name: string;
+  title: string;
+  description: string;
+  created_at: string;
+  published_at: string;
+  url: string;
+  thumbnail_url: string;
+  viewable: string;
+  view_count: number;
+  language: string;
+  type: string;
+  duration: string;
+  muted_segments: string[];
+};
 
 export async function getVideos() {
   return prisma.videos.findMany({
     orderBy: { createdAt: "desc" },
     include: { likes: true, tags: true },
-    take: 16,
+    take: 32,
   });
 }
 
-export function addVideo({
-  userId,
-  url,
-  thumbnail,
-  title,
-  description,
-  tags,
-}: {
-  userId: User["id"];
-  url: string;
-  thumbnail: string;
-  title: string;
-  description: string;
-  tags: string[];
-}) {
-  return prisma.videos.create({
-    data: {
-      url,
-      thumbnail,
-      title,
-      description,
-      user: { connect: { id: userId } },
-      tags: {
-        connectOrCreate: tags.map((tag) => {
-          return {
-            where: { name: tag },
-            create: { name: tag },
-          };
-        }),
-      },
-      likes: {},
-    },
+export async function clearVideosByUser(userId: User["id"]) {
+  return await prisma.videos.deleteMany({ where: { userId: userId } });
+}
+
+export async function addVideos({ videos }: { videos: Array<Video> }) {
+  const videosRemovedIds = map(videos, (v) => omit(v, ["id"]));
+  return await prisma.videos.createMany({
+    data: videosRemovedIds,
+    skipDuplicates: true,
   });
 }
