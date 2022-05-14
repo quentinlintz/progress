@@ -139,7 +139,6 @@ export default function Profile() {
 
   let submittingState = transition.state === "submitting";
 
-  const videos = user.videos;
   const streamSources = user.streamSources;
 
   const twitchSource =
@@ -260,24 +259,6 @@ export default function Profile() {
           <Button onClick={handleSignOut}>Sign out</Button>
         </Stack>
       </Container>
-      <Stack spacing={"4"} alignItems={"center"}>
-        <Spacer />
-        <Text fontWeight={"600"} fontSize={"xl"}>
-          Videos
-        </Text>
-        {videos.length !== 0 ? (
-          videos.map((video: Video) => video.title)
-        ) : (
-          <>
-            <Text fontWeight={"300"} fontSize={"xl"} isTruncated>
-              You haven't posted anything yet
-            </Text>
-            <Button colorScheme={"cyan"}>
-              <Link to="/post">Post Now</Link>
-            </Button>
-          </>
-        )}
-      </Stack>
     </>
   );
 }
