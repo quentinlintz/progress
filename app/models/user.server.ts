@@ -19,11 +19,21 @@ export async function getUserByEmail(email?: User["email"]) {
   return prisma.users.findUnique({ where: { email } });
 }
 
+export async function updateReceiveUpdates(
+  id: User["id"],
+  updates: User["updates"]
+) {
+  return await prisma.users.update({
+    where: { id },
+    data: { updates },
+  });
+}
+
 export async function updateRemainingVideos(
   id: User["id"],
   remainingVideos: User["remainingVideos"]
 ) {
-  return prisma.users.update({
+  return await prisma.users.update({
     where: { id },
     data: { remainingVideos },
   });

@@ -88,8 +88,7 @@ export default function Post() {
     user.videos
   );
 
-  let transitionState =
-    transition.state === "submitting" || transition.state === "loading";
+  let submittingState = transition.state === "submitting";
 
   const handleSave = () => {
     const formData = new FormData();
@@ -111,8 +110,8 @@ export default function Post() {
           colorScheme="cyan"
           size="lg"
           onClick={handleSave}
-          disabled={transitionState}
-          isLoading={transitionState}
+          disabled={submittingState}
+          isLoading={submittingState}
         >
           Save
         </Button>

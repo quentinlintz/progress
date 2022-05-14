@@ -9,6 +9,7 @@ import {
 import Header from "~/components/Header";
 import {
   Button,
+  Checkbox,
   Container,
   Flex,
   Input,
@@ -19,7 +20,12 @@ import {
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useSupabase } from "~/utils/supabase-client";
-import { getUserById, getUserId, requireUserId } from "~/models/user.server";
+import {
+  getUserById,
+  getUserId,
+  requireUserId,
+  updateReceiveUpdates,
+} from "~/models/user.server";
 import type { Video } from "~/models/videos.server";
 import { StreamType } from "~/models/videos.server";
 import type { StreamSource } from "~/models/streamSources.server";
@@ -28,10 +34,13 @@ import { addStreamSource } from "~/models/streamSources.server";
 import { IconBrandTwitch } from "@tabler/icons";
 import invariant from "tiny-invariant";
 import ErrorMessage from "~/components/ErrorMessage";
+import { useState } from "react";
 
 export const action: ActionFunction = async ({ request }) => {
+  const userId = await getUserId(request);
   const formData = await request.formData();
   const login = String(formData.get("login"));
+  const updates = String(formData.get("updates")) === "true";
   const action = formData.get("action");
 
   const clientId = process.env.TWITCH_CLIENT_ID as string;
@@ -103,6 +112,11 @@ export const action: ActionFunction = async ({ request }) => {
 
       await removeStreamSource(streamSourceData);
     }
+
+    case "save": {
+      console.log("setting updates", updates);
+      await updateReceiveUpdates(userId, updates);
+    }
   }
 
   return json({ ok: true });
@@ -118,12 +132,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Profile() {
   const errors = useActionData();
   const { user } = useLoaderData();
+  const [updates, setUpdates] = useState<boolean>(user.updates);
   const transition = useTransition();
   const submit = useSubmit();
   const supabase = useSupabase();
 
-  let transitionState =
-    transition.state === "submitting" || transition.state === "loading";
+  let submittingState = transition.state === "submitting";
 
   const videos = user.videos;
   const streamSources = user.streamSources;
@@ -134,6 +148,15 @@ export default function Profile() {
       return streamType === "TWITCH";
     }) ?? null;
 
+  const handleSave = () => {
+    const formData = new FormData();
+
+    formData.append("updates", String(updates));
+    formData.append("action", "save");
+
+    submit(formData, { method: "post", action: "/profile" });
+  };
+
   const handleSignOut = () => {
     supabase.auth.signOut().then(() => {
       submit(null, { method: "post", action: "/signout" });
@@ -143,6 +166,20 @@ export default function Profile() {
   return (
     <>
       <Header />
+      <Flex alignItems={"center"} pl={4} pr={4}>
+        <Text flex="1" fontWeight={"600"} fontSize={["xl", "2xl"]}></Text>
+        <Button
+          colorScheme="cyan"
+          size="lg"
+          name="action"
+          value="save"
+          onClick={handleSave}
+          disabled={submittingState}
+          isLoading={submittingState}
+        >
+          Save
+        </Button>
+      </Flex>
       <Container maxW="xl" p={8}>
         <Stack spacing={"8"}>
           <Flex>
@@ -162,6 +199,16 @@ export default function Profile() {
             <Text fontWeight={"200"} fontSize={"xl"} isTruncated>
               {user.remainingVideos}
             </Text>
+          </Flex>
+          <Flex>
+            <Text fontWeight={"600"} fontSize={"xl"}>
+              Email updates:
+            </Text>
+            <Spacer />
+            <Checkbox
+              isChecked={updates}
+              onChange={(e) => setUpdates(e.target.checked)}
+            />
           </Flex>
           <Form method="post">
             <Flex>
@@ -184,8 +231,8 @@ export default function Profile() {
                   type="submit"
                   name="action"
                   value="unlink"
-                  disabled={transitionState}
-                  isLoading={transitionState}
+                  disabled={submittingState}
+                  isLoading={submittingState}
                 >
                   Unlink
                 </Button>
@@ -199,8 +246,8 @@ export default function Profile() {
                   type="submit"
                   name="action"
                   value="link"
-                  disabled={transitionState}
-                  isLoading={transitionState}
+                  disabled={submittingState}
+                  isLoading={submittingState}
                 >
                   Link
                 </Button>
