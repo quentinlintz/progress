@@ -32,12 +32,14 @@ model videos {
   likes       likes[]
 }
 
+// For later use
 model tags {
   id     String   @id @default(uuid()) @db.Uuid
   name   String   @unique
   videos videos[]
 }
 
+// For later use
 model likes {
   id      String  @id @default(uuid()) @db.Uuid
   Video   videos? @relation(fields: [videoId], references: [id])

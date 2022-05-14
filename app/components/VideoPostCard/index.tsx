@@ -2,7 +2,6 @@ import { useContext, useState } from "react";
 import {
   Box,
   Checkbox,
-  Input,
   Stack,
   Text,
   useColorModeValue,
@@ -64,9 +63,9 @@ const VideoPostCard = ({ video, isSelected }: Props) => {
           <Text fontWeight={"300"}>Created on: {readableDate}</Text>
         </Stack>
       </Checkbox>
-      {isChecked ? (
+      {/* {isChecked ? (
         <Input mt={4} flex="1" placeholder="comma separated tags, max: 10" />
-      ) : null}
+      ) : null} */}
     </Box>
   );
 };
