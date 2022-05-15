@@ -34,7 +34,7 @@ export async function getVideos() {
   });
 }
 
-export async function clearVideosByUser(userId: User["id"]) {
+export async function removeVideosByUser(userId: User["id"]) {
   return await prisma.videos.deleteMany({ where: { userId: userId } });
 }
 

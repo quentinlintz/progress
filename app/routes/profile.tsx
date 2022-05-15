@@ -1,6 +1,5 @@
 import {
   Form,
-  Link,
   useActionData,
   useLoaderData,
   useSubmit,
@@ -25,8 +24,9 @@ import {
   getUserId,
   requireUserId,
   updateReceiveUpdates,
+  updateRemainingVideos,
 } from "~/models/user.server";
-import type { Video } from "~/models/videos.server";
+import { removeVideosByUser } from "~/models/videos.server";
 import { StreamType } from "~/models/videos.server";
 import type { StreamSource } from "~/models/streamSources.server";
 import { removeStreamSource } from "~/models/streamSources.server";
@@ -111,11 +111,18 @@ export const action: ActionFunction = async ({ request }) => {
       };
 
       await removeStreamSource(streamSourceData);
+
+      // When adding new stream sources, make sure to remove only videos of a certain stream source
+      await removeVideosByUser(userId);
+      await updateRemainingVideos(userId, 4);
+
+      return json({ ok: true });
     }
 
     case "save": {
-      console.log("setting updates", updates);
       await updateReceiveUpdates(userId, updates);
+
+      return json({ ok: true });
     }
   }
 

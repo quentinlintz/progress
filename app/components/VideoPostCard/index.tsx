@@ -28,7 +28,9 @@ const VideoPostCard = ({ video, isSelected }: Props) => {
 
   const handleChecked = (e: any) => {
     if (!e.target.checked) {
-      setSelectedVideos(selectedVideos.filter((v: Video) => v.id !== video.id));
+      setSelectedVideos(
+        selectedVideos.filter((v: Video) => v.videoId !== video.videoId)
+      );
       setRemainingVideos(remainingVideos + 1);
       setIsChecked(e.target.checked);
     } else if (remainingVideos > 0) {

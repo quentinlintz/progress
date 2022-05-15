@@ -14,7 +14,7 @@ import {
 } from "~/models/user.server";
 import { unionBy, some } from "lodash";
 import type { Video } from "~/models/videos.server";
-import { addVideos, clearVideosByUser } from "~/models/videos.server";
+import { addVideos, removeVideosByUser } from "~/models/videos.server";
 import { convertTwitchVideos } from "~/utils/video";
 
 export const action: ActionFunction = async ({ request }) => {
@@ -25,9 +25,9 @@ export const action: ActionFunction = async ({ request }) => {
 
   // TODO think of an algorithm to optimize this!
   // Drop all current videos
-  clearVideosByUser(userId);
+  await removeVideosByUser(userId);
   // Add all selected videos
-  addVideos({ videos: selectedVideos });
+  await addVideos({ videos: selectedVideos });
 
   await updateRemainingVideos(userId, remainingVideos);
 
@@ -42,8 +42,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ loaderError: "User not found." });
   }
 
-  if (user?.streamSources.length === 0) {
-    return json({ loaderError: "You haven't linked a stream source yet." });
+  if (user.streamSources.length === 0) {
+    return json({
+      user,
+      videos: [],
+      loaderError: "You haven't linked a stream source yet.",
+    });
   }
 
   const streamSource = user.streamSources[0];
@@ -65,7 +69,11 @@ export const loader: LoaderFunction = async ({ request }) => {
     .then((res) => res.data);
 
   if (twitchVideos.length === 0) {
-    return json({ loaderError: "You have no videos to post." });
+    return json({
+      user,
+      videos: [],
+      loaderError: "You have no videos to post.",
+    });
   }
 
   const videos = convertTwitchVideos({
@@ -140,7 +148,7 @@ export default function Post() {
                 <VideoPostCard
                   key={video.id}
                   video={video}
-                  isSelected={some(selectedVideos, ["id", video.id])}
+                  isSelected={some(selectedVideos, ["videoId", video.videoId])}
                 />
               );
             })}
