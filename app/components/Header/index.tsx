@@ -7,6 +7,7 @@ import {
   Stack,
   useColorMode,
   HStack,
+  Image,
 } from "@chakra-ui/react";
 import {
   IconMoonStars,
@@ -16,6 +17,7 @@ import {
   IconX,
   IconUser,
 } from "@tabler/icons";
+import logo from "../../images/progress.png";
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -64,6 +66,9 @@ const Header = () => {
                 <Button>
                   <IconUser />
                 </Button>
+              </Link>
+              <Link to="/">
+                <Image src={logo} boxSize="34px" mt="1" alt="Progress" />
               </Link>
             </Stack>
           </Flex>

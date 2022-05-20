@@ -213,13 +213,13 @@ export default function Profile() {
             <Spacer />
             <Checkbox
               isChecked={updates}
-              onChange={(e) => setUpdates(e.target.checked)}
+              onChange={(e: any) => setUpdates(e.target.checked)}
             />
           </Flex>
           <Form method="post">
             <Flex>
               <Input
-                flex="4"
+                flex="3"
                 borderRightRadius="0"
                 placeholder={
                   twitchSource ? twitchSource.name : "Your Twitch username"

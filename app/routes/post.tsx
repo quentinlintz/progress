@@ -85,7 +85,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Post() {
-  const { user, videos, error } = useLoaderData();
+  const { user, videos, loaderError } = useLoaderData();
   const submit = useSubmit();
   const transition = useTransition();
   const mergedVideos = unionBy(videos, user.videos, "videoId");
@@ -125,14 +125,13 @@ export default function Post() {
         </Button>
       </Flex>
       <Container alignItems={"center"} pr={4} pl={4}>
-        <Text
-          fontWeight={"300"}
-          fontSize={"md"}
-          textAlign={"center"}
-          pb="4"
-          pt="4"
-        >
+        <Text fontWeight={"300"} fontSize={"md"} textAlign={"center"} pt="4">
           Select which videos you want to post.
+        </Text>
+        <Text fontWeight={"300"} fontSize={"sm"} textAlign={"center"} pb="4">
+          If your video is updated or removed on Twitch, you'll have to apply
+          the changes here, too. This experience will be improved with future
+          versions of Progress.
         </Text>
         <PostContext.Provider
           value={{
@@ -154,7 +153,7 @@ export default function Post() {
             })}
           </Stack>
         </PostContext.Provider>
-        {error ? <ErrorMessage>{error}</ErrorMessage> : null}
+        {loaderError ? <ErrorMessage>{loaderError}</ErrorMessage> : null}
       </Container>
     </>
   );
