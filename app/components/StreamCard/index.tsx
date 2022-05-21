@@ -36,6 +36,7 @@ const StreamCard = ({
 
   return (
     <motion.div
+      style={{ display: "flex" }}
       whileHover={{
         scale: 1.1,
       }}

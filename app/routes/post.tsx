@@ -1,11 +1,11 @@
-import { Button, Container, Flex, Stack, Text } from "@chakra-ui/react";
+import { Button, Container, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import { useLoaderData, useSubmit, useTransition } from "@remix-run/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
 import ErrorMessage from "~/components/ErrorMessage";
 import Header from "~/components/Header";
-import VideoPostCard from "~/components/VideoPostCard";
+import VideoCardSelect from "~/components/VideoCardSelect";
 import { PostContext } from "~/contexts/PostContext";
 import {
   getUserById,
@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const accessToken = process.env.TWITCH_ACCESS_TOKEN as string;
 
   const twitchVideos = await fetch(
-    `https://api.twitch.tv/helix/videos?user_id=${streamSource.streamId}&first=1&sort=time&type=archive`,
+    `https://api.twitch.tv/helix/videos?user_id=${streamSource.streamId}&first=100&sort=time&type=archive`,
     {
       method: "GET",
       headers: {
@@ -133,28 +133,28 @@ export default function Post() {
           the changes here, too. This experience will be improved with future
           versions of Progress.
         </Text>
-        <PostContext.Provider
-          value={{
-            selectedVideos,
-            setSelectedVideos,
-            remainingVideos,
-            setRemainingVideos,
-          }}
-        >
-          <Stack spacing="5">
-            {mergedVideos.map((video: any) => {
-              return (
-                <VideoPostCard
-                  key={video.id}
-                  video={video}
-                  isSelected={some(selectedVideos, ["videoId", video.videoId])}
-                />
-              );
-            })}
-          </Stack>
-        </PostContext.Provider>
         {loaderError ? <ErrorMessage>{loaderError}</ErrorMessage> : null}
       </Container>
+      <PostContext.Provider
+        value={{
+          selectedVideos,
+          setSelectedVideos,
+          remainingVideos,
+          setRemainingVideos,
+        }}
+      >
+        <SimpleGrid columns={[1, 1, 2, 2, 3]} spacing={8} p={8}>
+          {mergedVideos.map((video: any) => {
+            return (
+              <VideoCardSelect
+                key={video.id}
+                video={video}
+                isSelected={some(selectedVideos, ["videoId", video.videoId])}
+              />
+            );
+          })}
+        </SimpleGrid>
+      </PostContext.Provider>
     </>
   );
 }
