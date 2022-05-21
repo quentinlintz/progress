@@ -12,6 +12,7 @@ import {
   Container,
   Flex,
   Input,
+  Link,
   Spacer,
   Stack,
   Text,
@@ -31,7 +32,7 @@ import { StreamType } from "~/models/videos.server";
 import type { StreamSource } from "~/models/streamSources.server";
 import { removeStreamSource } from "~/models/streamSources.server";
 import { addStreamSource } from "~/models/streamSources.server";
-import { IconBrandTwitch } from "@tabler/icons";
+import { IconBrandDiscord, IconBrandTwitch } from "@tabler/icons";
 import invariant from "tiny-invariant";
 import ErrorMessage from "~/components/ErrorMessage";
 import { useState } from "react";
@@ -263,6 +264,14 @@ export default function Profile() {
               {errors?.userName ? errors.userName : null}
             </ErrorMessage>
           </Form>
+          <Link
+            style={{ textDecoration: "none" }}
+            href="https://discord.gg/EQ8dvBN8Dq"
+          >
+            <Button w="100%" leftIcon={<IconBrandDiscord />} bgColor="#7289da">
+              Join the Discord!
+            </Button>
+          </Link>
           <Button onClick={handleSignOut}>Sign out</Button>
         </Stack>
       </Container>
