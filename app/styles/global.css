@@ -1,0 +1,14 @@
+/* override supabase ui */
+.sbui-formlayout__label,
+.sbui-typography-text  {
+  color: unset !important;
+}
+.sbui-btn-primary {
+  background: #2C7A7B !important;
+}
+.sbui-checkbox__label-container__label {
+  color: unset !important;
+}
+a.sbui-typography-link {
+  color: #319795 !important;
+}

@@ -1,66 +1,89 @@
-import bcrypt from "bcryptjs";
-import { createClient } from "@supabase/supabase-js";
-import invariant from "tiny-invariant";
+import type { users as User } from "@prisma/client";
+import { redirect } from "@remix-run/node";
+import { getSession } from "~/utils/supabase.server";
+import prisma from "../utils/prisma";
 
-export type User = { id: string; email: string };
+export type { users as User } from "@prisma/client";
 
-// Abstract this away
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const USER_SESSION_KEY = "userId";
 
-invariant(
-  supabaseUrl,
-  "SUPABASE_URL must be set in your environment variables."
-);
-invariant(
-  supabaseAnonKey,
-  "SUPABASE_URL must be set in your environment variables."
-);
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-export async function createUser(email: string, password: string) {
-  const { user } = await supabase.auth.signUp({
-    email,
-    password,
+export async function getUserById(id: User["id"]) {
+  return prisma.users.findUnique({
+    where: { id },
+    include: { videos: true, streamSources: true },
   });
-
-  // get the user profile after created
-  const profile = await getProfileByEmail(user?.email);
-
-  return profile;
 }
 
-export async function getProfileById(id: string) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("email, id")
-    .eq("id", id)
-    .single();
-
-  if (error) return null;
-  if (data) return { id: data.id, email: data.email };
+export async function getUserByEmail(email?: User["email"]) {
+  if (email === undefined) return null;
+  return prisma.users.findUnique({ where: { email } });
 }
 
-export async function getProfileByEmail(email?: string) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("email, id")
-    .eq("email", email)
-    .single();
-
-  if (error) return null;
-  if (data) return data;
-}
-
-export async function verifyLogin(email: string, password: string) {
-  const { user, error } = await supabase.auth.signIn({
-    email,
-    password,
+export async function updateReceiveUpdates(
+  id: User["id"],
+  updates: User["updates"]
+) {
+  return await prisma.users.update({
+    where: { id },
+    data: { updates },
   });
+}
 
-  if (error) return undefined;
-  const profile = await getProfileByEmail(user?.email);
+export async function updateRemainingVideos(
+  id: User["id"],
+  remainingVideos: User["remainingVideos"]
+) {
+  return await prisma.users.update({
+    where: { id },
+    data: { remainingVideos },
+  });
+}
 
-  return profile;
+export async function getUserId(request: Request) {
+  let session = await getSession(request.headers.get("Cookie"));
+  const userId = session.get(USER_SESSION_KEY);
+
+  return userId;
+}
+
+export async function getUser(request: Request) {
+  const userId = await getUserId(request);
+  if (userId === undefined) return null;
+
+  const user = await getUserById(userId);
+  if (user) return user;
+
+  throw await signOut(request);
+}
+
+export async function requireUserId(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+) {
+  const userId = await getUserId(request);
+  if (!userId) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+    throw redirect(`/signin?${searchParams}`);
+  }
+
+  return userId;
+}
+
+export async function requireUser(request: Request) {
+  const userId = await requireUserId(request);
+  if (userId == undefined) return null;
+
+  const profile = await getUserById(userId);
+  if (profile) return profile;
+
+  throw await signOut(request);
+}
+
+export async function signOut(request: Request) {
+  let session = await getSession(request.headers.get("Cookie"));
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await sessionStorage.destroySession(session),
+    },
+  });
 }
