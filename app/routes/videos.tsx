@@ -27,7 +27,7 @@ export default function Videos() {
         </SimpleGrid>
       ) : (
         <Center>
-          <Text fontSize="2xl">There are no streams, yet!</Text>
+          <Text fontSize="2xl">There are no videos, yet!</Text>
         </Center>
       )}
     </>

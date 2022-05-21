@@ -1,4 +1,11 @@
-import { Button, Container, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Container,
+  Flex,
+  SimpleGrid,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { useLoaderData, useSubmit, useTransition } from "@remix-run/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
@@ -88,6 +95,7 @@ export default function Post() {
   const { user, videos, loaderError } = useLoaderData();
   const submit = useSubmit();
   const transition = useTransition();
+  const toast = useToast();
   const mergedVideos = unionBy(videos, user.videos, "videoId");
   const [remainingVideos, setRemainingVideos] = useState<Number>(
     user.remainingVideos
@@ -105,6 +113,13 @@ export default function Post() {
     formData.append("remainingVideos", remainingVideos.toString());
 
     submit(formData, { method: "post", action: "/post" });
+
+    toast({
+      title: "Save successful.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   return (

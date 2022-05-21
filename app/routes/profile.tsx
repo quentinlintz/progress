@@ -12,9 +12,11 @@ import {
   Container,
   Flex,
   Input,
+  Link,
   Spacer,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -31,7 +33,7 @@ import { StreamType } from "~/models/videos.server";
 import type { StreamSource } from "~/models/streamSources.server";
 import { removeStreamSource } from "~/models/streamSources.server";
 import { addStreamSource } from "~/models/streamSources.server";
-import { IconBrandTwitch } from "@tabler/icons";
+import { IconBrandDiscord, IconBrandTwitch } from "@tabler/icons";
 import invariant from "tiny-invariant";
 import ErrorMessage from "~/components/ErrorMessage";
 import { useState } from "react";
@@ -141,6 +143,7 @@ export default function Profile() {
   const { user } = useLoaderData();
   const [updates, setUpdates] = useState<boolean>(user.updates);
   const transition = useTransition();
+  const toast = useToast();
   const submit = useSubmit();
   const supabase = useSupabase();
 
@@ -161,6 +164,13 @@ export default function Profile() {
     formData.append("action", "save");
 
     submit(formData, { method: "post", action: "/profile" });
+
+    toast({
+      title: "Save successful.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const handleSignOut = () => {
@@ -263,6 +273,14 @@ export default function Profile() {
               {errors?.userName ? errors.userName : null}
             </ErrorMessage>
           </Form>
+          <Link
+            style={{ textDecoration: "none" }}
+            href="https://discord.gg/EQ8dvBN8Dq"
+          >
+            <Button w="100%" leftIcon={<IconBrandDiscord />} bgColor="#7289da">
+              Join the Discord!
+            </Button>
+          </Link>
           <Button onClick={handleSignOut}>Sign out</Button>
         </Stack>
       </Container>
