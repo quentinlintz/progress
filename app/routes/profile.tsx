@@ -16,6 +16,7 @@ import {
   Spacer,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -142,6 +143,7 @@ export default function Profile() {
   const { user } = useLoaderData();
   const [updates, setUpdates] = useState<boolean>(user.updates);
   const transition = useTransition();
+  const toast = useToast();
   const submit = useSubmit();
   const supabase = useSupabase();
 
@@ -162,6 +164,13 @@ export default function Profile() {
     formData.append("action", "save");
 
     submit(formData, { method: "post", action: "/profile" });
+
+    toast({
+      title: "Save successful.",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const handleSignOut = () => {
